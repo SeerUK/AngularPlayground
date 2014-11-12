@@ -3,7 +3,7 @@
     "use strict";
 
     angular.module("ap.modules.blog")
-        .factory("ArticleGateway", function($http, $q) {
+        .factory("ArticleGateway", function($http, $q, HttpException, NotFoundException) {
 
             /**
              * Make a request to the 'API'
@@ -12,12 +12,14 @@
              */
             var doRequest = function() {
                 return $http({ method: "GET", url: "api/articles.json" })
-                    .success(function(result) {
-                        return result.data.articles;
-                    })
-                    .error(function(result, status) {
-                        throw new Error("Request failed, status: " + status);
-                    })
+                    .then(
+                        function(result) {
+                            return result.data.articles;
+                        },
+                        function(reason) {
+                            throw new HttpException(null, reason.statusText, reason.status);
+                        }
+                    )
                 ;
             };
 
@@ -28,7 +30,15 @@
                  * @return {Object}
                  */
                 fetch: function() {
-                    return doRequest();
+                    return doRequest()
+                        .catch(function(error) {
+                            if (error instanceof HttpException && error.status === 404) {
+                                throw new NotFoundException(error, "articles");
+                            }
+
+                            throw error;
+                        })
+                    ;
                 },
 
                 /**
@@ -37,13 +47,22 @@
                  * @return {Object}
                  */
                 fetchOneBySlug: function(slug) {
-                    return doRequest().then(function(result) {
-                        if (result[slug]) {
-                            return result[slug];
-                        } else {
-                            throw new Error("No article found with slug: \"" + slug + "\"");
-                        }
-                    });
+                    return doRequest()
+                        .then(function(result) {
+                            if (result[slug]) {
+                                return result[slug];
+                            } else {
+                                throw new NotFoundException(null, "article", { slug: slug });
+                            }
+                        })
+                        .catch(function(error) {
+                            if (error instanceof HttpException && error.status === 404) {
+                                throw new NotFoundException(error, "articles");
+                            }
+
+                            throw error;
+                        })
+                    ;
                 }
             };
         })

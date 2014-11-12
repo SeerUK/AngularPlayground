@@ -16,7 +16,7 @@
                     templateUrl: "app/src/modules/blog/resources/views/article-list.html",
                     url: "/",
                     resolve: {
-                        articles: function(ArticleGateway) {
+                        articles: function(ArticleGateway, HttpException) {
                             return ArticleGateway.fetch();
                         }
                     }
