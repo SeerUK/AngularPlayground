@@ -8,20 +8,16 @@
                 .state("blog", {
                     abstract: true,
                     controller: "AbstractBlogCtrl",
-                    templateUrl: "app/src/modules/blog/resources/views/master.html",
-                    url: "/"
+                    templateUrl: "app/src/modules/core/resources/views/master.html"
                 })
 
                 .state("blog.article-list", {
                     controller: "ArticleListCtrl",
                     templateUrl: "app/src/modules/blog/resources/views/article-list.html",
+                    url: "/",
                     resolve: {
-                        articles: function($http) {
-                            return $http({ method: "GET", url: "api/articles.json" })
-                                .then(function(result) {
-                                    return result.data.articles;
-                                })
-                            ;
+                        articles: function(ArticleGateway) {
+                            return ArticleGateway.fetch();
                         }
                     }
                 })
@@ -29,14 +25,10 @@
                 .state("blog.article-view", {
                     controller: "ArticleViewCtrl",
                     templateUrl: "app/src/modules/blog/resources/views/article-view.html",
-                    url: "{slug}/",
+                    url: "/{slug}/",
                     resolve: {
-                        article: function($http, $stateParams) {
-                            return $http({ method: "GET", url: "api/articles.json" })
-                                .then(function(result) {
-                                    return result.data.articles[$stateParams.slug];
-                                })
-                            ;
+                        article: function($stateParams, ArticleGateway) {
+                            return ArticleGateway.fetchOneBySlug($stateParams.slug);
                         }
                     }
                 })

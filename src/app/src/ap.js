@@ -2,12 +2,9 @@
 
     "use strict";
 
-    angular.module("ap", [ "ap.modules.blog", "ui.router" ])
+    angular.module("ap", [ "ap.modules.core", "ap.modules.blog", "ui.router" ])
         .config(function($stateProvider, $urlRouterProvider) {
-            $urlRouterProvider.otherwise("/");
-        })
-        .run(function($state) {
-            $state.go("blog.article-list");
+            $urlRouterProvider.otherwise("/404/");
         })
     ;
 
