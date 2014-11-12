@@ -1,0 +1,10 @@
+<p>Articles:</p>
+<ul>
+    <li ng-repeat="(slug, article) in articles">
+        <p>
+            <strong>{{article.title}}</strong><br />
+            <em>{{article.subtitle}}</em>
+        </p>
+        <a ui-sref="blog.article-view({slug: slug})">Read article...</a>
+    </li>
+</ul>

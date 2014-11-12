@@ -1,12 +1,30 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" ng-app="ap">
 <head>
     <meta charset="UTF-8">
     <title>Angular Playground</title>
-</head>
-<body>
-    <p>Hello world!</p>
 
-    <script src="assets/vendor/angular.min.js" type="text/javascript"></script>
+    <style type="text/css">
+        .ng-cloak { display: none; }
+    </style>
+</head>
+<body ng-cloak class="ng-cloak">
+    <main ui-view>
+        <p>Loading...</p>
+    </main>
+
+    <!-- Vendor -->
+    <script src="assets/vendor/angular/angular.js" type="text/javascript"></script>
+    <script src="assets/vendor/angular-ui-router/release/angular-ui-router.js" type="text/javascript"></script>
+
+    <!-- Angular Playground -->
+    <script src="app/src/ap.js" type="text/javascript"></script>
+
+    <!-- Blog Module -->
+    <script src="app/src/modules/blog/ap.modules.blog.js" type="text/javascript"></script>
+    <script src="app/src/modules/blog/controllers/AbstractBlogCtrl.js" type="text/javascript"></script>
+    <script src="app/src/modules/blog/controllers/ArticleListCtrl.js" type="text/javascript"></script>
+    <script src="app/src/modules/blog/controllers/ArticleViewCtrl.js" type="text/javascript"></script>
+    <script src="app/src/modules/blog/resources/config/ap.routes.blog.js" type="text/javascript"></script>
 </body>
 </html>

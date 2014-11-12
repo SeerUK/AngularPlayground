@@ -1,0 +1,14 @@
+{
+    "articles": {
+        "learning-angularjs": {
+            "title": "Learning AngularJS",
+            "subtitle": "Starting with Application Structure",
+            "content": "This would be the content of the post. I wonder if AngularJS automatically escapes <strong>HTML elements</strong>."
+        },
+        "learning-angularjs-part-2": {
+            "title": "Learning AngularJS: Part 2",
+            "subtitle": "Angular UI Router",
+            "content": "<p>Since Angular actually does allow HTML to be dumped into the page from a variable, I'm going to abuse that. What I should really do is see if there's a way of making it not do that.</p><p>This is working okay so far though. Resolve seems very handy.</p>"
+        }
+    }
+}
