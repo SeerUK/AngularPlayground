@@ -1,2 +1,3 @@
 <h2>Not Found!</h2>
-<p>Sorry, this page was not found.</p>
+<p ng-if="message">{{::message}}</p>
+<p ng-if="!message">Sorry, the resource was not found.</p>

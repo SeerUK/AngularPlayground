@@ -11,7 +11,14 @@
              * @return {Object}
              */
             var doRequest = function() {
-                return $http({ method: "GET", url: "api/articles.json" });
+                return $http({ method: "GET", url: "api/articles.json" })
+                    .success(function(result) {
+                        return result;
+                    })
+                    .error(function(result, status) {
+                        throw new Error("Request failed, status: " + status);
+                    })
+                ;
             };
 
             return {
@@ -41,7 +48,11 @@
                     var response = doRequest();
 
                     response.then(function(result) {
-                        deferred.resolve(result.data.articles[slug]);
+                        if (result.data.articles[slug]) {
+                            deferred.resolve(result.data.articles[slug]);
+                        } else {
+                            deferred.reject("No article found with slug: \"" + slug + "\"");
+                        }
                     });
 
                     return deferred.promise;
