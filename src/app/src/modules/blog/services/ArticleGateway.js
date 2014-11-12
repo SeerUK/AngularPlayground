@@ -13,7 +13,7 @@
             var doRequest = function() {
                 return $http({ method: "GET", url: "api/articles.json" })
                     .success(function(result) {
-                        return result;
+                        return result.data.articles;
                     })
                     .error(function(result, status) {
                         throw new Error("Request failed, status: " + status);
@@ -28,14 +28,7 @@
                  * @return {Object}
                  */
                 fetch: function() {
-                    var deferred = $q.defer();
-                    var response = doRequest();
-
-                    response.then(function(result) {
-                        deferred.resolve(result.data.articles);
-                    });
-
-                    return deferred.promise;
+                    return doRequest();
                 },
 
                 /**
@@ -44,18 +37,13 @@
                  * @return {Object}
                  */
                 fetchOneBySlug: function(slug) {
-                    var deferred = $q.defer();
-                    var response = doRequest();
-
-                    response.then(function(result) {
-                        if (result.data.articles[slug]) {
-                            deferred.resolve(result.data.articles[slug]);
+                    return doRequest().then(function(result) {
+                        if (result[slug]) {
+                            return result[slug];
                         } else {
-                            deferred.reject("No article found with slug: \"" + slug + "\"");
+                            throw new Error("No article found with slug: \"" + slug + "\"");
                         }
                     });
-
-                    return deferred.promise;
                 }
             };
         })
