@@ -90,12 +90,14 @@
 
                                 deferred.resolve(value);
                             } catch(e) {
+                                deferred.reject(e);
+
                                 if (
                                     e.name === 'QuotaExceededError' ||
                                     e.name === 'NS_ERROR_DOM_QUOTA_REACHED'
                                 ) {
-                                    console.warn("[Cache]", "localStorage storage limit reached.");
-                                    deferred.reject(e);
+                                    console.warn("[Cache]", "localStorage storage limit reached. Flushing.");
+                                    Cache.empty();
                                 } else {
                                     throw e;
                                 }
@@ -122,19 +124,11 @@
              * @return {Mixed}
              */
             Cache.proxy = function(key, value, ttl) {
-                var deferred = $q.defer();
-
-                Cache.get(key).then(function(value) {
-                    deferred.resolve(value);
-                }, function() {
-                    Cache.set(key, value, ttl).then(function(value) {
-                        deferred.resolve(value);
-                    }, function() {
-                        deferred.reject();
-                    });
-                });
-
-                return deferred.promise;
+                return Cache.get(key)
+                    .catch(function() {
+                        return Cache.set(key, value, ttl);
+                    })
+                ;
             };
 
             /**
