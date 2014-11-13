@@ -3,7 +3,7 @@
     "use strict";
 
     angular.module("ap.modules.blog")
-        .factory("ArticleGateway", function($http, $q, HttpException, NotFoundException) {
+        .factory("ArticleGateway", function($http, $q, Cache, HttpException, NotFoundException) {
 
             /**
              * Make a request to the 'API'
@@ -11,16 +11,18 @@
              * @return {Object}
              */
             var doRequest = function() {
-                return $http({ method: "GET", url: "api/articles.json" })
-                    .then(
-                        function(result) {
-                            return result.data.articles;
-                        },
-                        function(reason) {
-                            throw new HttpException(null, reason.statusText, reason.status);
-                        }
-                    )
-                ;
+                return Cache.proxy("blog.articles", function() {
+                    return $http({ method: "GET", url: "api/articles.json" })
+                        .then(
+                            function(result) {
+                                return result.data.articles;
+                            },
+                            function(reason) {
+                                throw new HttpException(null, reason.statusText, reason.status);
+                            }
+                        )
+                    ;
+                });
             };
 
             return {
