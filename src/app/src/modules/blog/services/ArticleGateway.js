@@ -11,6 +11,22 @@
              * @return {Object}
              */
             var doRequest = function() {
+                Cache.set("foo", "bar");
+                Cache.get("foo").then(function(value) {
+                    console.log(value);
+                });
+
+                Cache.delete("foo");
+
+                // console.log("Deleting... ", "foo");
+                // Cache.delete("foo");
+
+                Cache.get("foo").then(function(value) {
+                    console.log(value);
+                }, function() {
+                    console.log("Missing");
+                });
+
                 return Cache.proxy("blog.articles", function() {
                     return $http({ method: "GET", url: "api/articles.json" })
                         .then(

@@ -6,7 +6,7 @@
         .factory("Cache", function($q) {
 
             var Cache = {};
-            var pendingActions = {};
+            var pendingAction;
             var prefix = "Cache_";
 
             /**
@@ -30,8 +30,8 @@
             Cache.get = function(key) {
                 var deferred = $q.defer();
 
-                pendingActions[key] = pendingActions[key] || $q.when();
-                pendingActions[key].finally(function() {
+                pendingAction = pendingAction || $q.when();
+                pendingAction.finally(function() {
                     var item = JSON.parse(localStorage.getItem(generateKey(key)));
 
                     if (item !== null && typeof item === "object") {
@@ -49,11 +49,11 @@
                     } else {
                         deferred.reject();
                     }
+
+                    pendingAction = undefined;
                 });
 
-                pendingActions[key] = deferred.promise;
-
-                return deferred.promise;
+                return pendingAction = deferred.promise;
             };
 
             /**
@@ -72,8 +72,8 @@
 
                 var deferred = $q.defer();
 
-                pendingActions[key] = pendingActions[key] || $q.when();
-                pendingActions[key].finally(function() {
+                pendingAction = pendingAction || $q.when();
+                pendingAction.finally(function() {
                     // Transform value into promise
                     value = $q.when(value);
                     value.then(
@@ -105,11 +105,11 @@
                             deferred.reject();
                         }
                     )
+
+                    pendingAction = undefined;
                 });
 
-                pendingActions[key] = deferred.promise;
-
-                return deferred.promise;
+                return pendingAction = deferred.promise;
             };
 
             /**
@@ -127,9 +127,6 @@
                 Cache.get(key).then(function(value) {
                     deferred.resolve(value);
                 }, function() {
-                    // Force new queue to be created
-                    delete pendingActions[key]
-
                     Cache.set(key, value, ttl).then(function(value) {
                         deferred.resolve(value);
                     }, function() {
@@ -148,27 +145,38 @@
             Cache.delete = function(key) {
                 var deferred = $q.defer();
 
-                pendingActions[key] = pendingActions[key] || $q.when();
-                pendingActions[key].finally(function() {
+                pendingAction = pendingAction || $q.when();
+                pendingAction.finally(function() {
                     localStorage.removeItem(generateKey(key));
 
                     deferred.resolve();
+
+                    pendingAction = undefined;
                 });
 
-                pendingActions[key] = deferred.promise;
-
-                return deferred.promise;
+                return pendingAction = deferred.promise;
             };
 
             /**
              * Flush the entire cache
              */
             Cache.empty = function() {
-                Object.keys(localStorage).forEach(function(key) {
-                    if (key.substr(0, prefix.length) === prefix) {
-                        Cache.delete(key.substr(prefix.length));
-                    }
-                })
+                var deferred = $q.defer();
+
+                pendingAction = pendingAction || $q.when();
+                pendingAction.finally(function() {
+                    Object.keys(localStorage).forEach(function(key) {
+                        if (key.substr(0, prefix.length) === prefix) {
+                            localStorage.removeItem(key);
+                        }
+                    });
+
+                    deferred.resolve();
+
+                    pendingAction = undefined;
+                });
+
+                return pendingAction = deferred.promise;
             };
 
             return Cache;
